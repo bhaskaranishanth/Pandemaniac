@@ -28,19 +28,26 @@ def run(file_name):
     # plt.show()
 
     # make_histogram(G)
-
     # make_ccdf_clustering(G)
 
     triangle_info = nx.triangles(G)
 
     # Strategy
-    s1_nodes = get_highest_degree_nodes(20, G)
-    s2_nodes = strategy_2(20, G)
-    strategies = {'s1' : s1_nodes, 's2' : s2_nodes}
-    output = sim.run(nx.to_dict_of_dicts(G), strategies)
-    print output
-    # Make the degree histogram for G
-    return G
+    start = 5
+    end = 30
+    win_rate = 0.0
+    for n in range(start, end):
+        s1_nodes = get_highest_degree_nodes(n, G)
+        s2_nodes = strategy_2(n, G)
+        # print "S1 nodes: ", sorted(s1_nodes)
+        # print "S2 nodes: ", sorted(s2_nodes)
+        strategies = {'s1' : s1_nodes, 's2' : s2_nodes}
+
+        output = sim.run(graph_data, strategies)
+        print "N: ", n, " Output: ", output
+        win_rate += 1 if output['s2'] > output['s1'] else 0
+    print "Win Rate: ", win_rate / (end - start + 1)
+
 
 def make_histogram(G):
     # Histogram
@@ -77,12 +84,17 @@ def make_ccdf_clustering(G):
     
 def get_highest_degree_nodes(n, G):
     D = nx.degree(G)
-    x = sorted(D, key = D.get)[:n]
+    x = sorted(D, key = D.get, reverse = True)[:n]
     return x
 
+
+''' Methods attempted: Degree Centrality, Closeness centrality,
+Choosing top n nodes with least degree, betweenness centrality
+'''
 def strategy_2(n, G):
-    D = nx.degree_centrality(G)
-    x = sorted(D, key = D.get)[:n]
+    # Perform betweenness principle
+    D = nx.closeness_centrality(G)
+    x = sorted(D, key = D.get, reverse=True)[:20]
     return x
 
 
