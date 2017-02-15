@@ -27,14 +27,16 @@ def run(file_name):
     # nx.draw(G)
     # plt.show()
 
-    make_histogram(G)
+    # make_histogram(G)
 
-    make_ccdf_clustering(G)
+    # make_ccdf_clustering(G)
 
     triangle_info = nx.triangles(G)
 
     # Strategy
-    strategies = {'s1' : [0, 1], 's2' : [5, 6]}
+    s1_nodes = get_highest_degree_nodes(20, G)
+    s2_nodes = strategy_2(20, G)
+    strategies = {'s1' : s1_nodes, 's2' : s2_nodes}
     output = sim.run(nx.to_dict_of_dicts(G), strategies)
     print output
     # Make the degree histogram for G
@@ -73,7 +75,15 @@ def make_ccdf_clustering(G):
     plt.title('CCDF Of Node Clustering Coefficients')
     plt.show()
     
+def get_highest_degree_nodes(n, G):
+    D = nx.degree(G)
+    x = sorted(D, key = D.get)[:n]
+    return x
 
+def strategy_2(n, G):
+    D = nx.degree_centrality(G)
+    x = sorted(D, key = D.get)[:n]
+    return x
 
 
 run('testgraph2.json')
