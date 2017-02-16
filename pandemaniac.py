@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import sim
 import numpy as np
 import collections
+import random
 
 def run(file_name):
     f = open(file_name, 'r')
@@ -21,6 +22,10 @@ def run(file_name):
         for n in v:
             G.add_edge(k, n)
 
+    # Output the two strategies
+    output_file(35, G, file_name)
+
+    return
 
     # pprint(graph_data)
     # print G.nodes()
@@ -29,8 +34,6 @@ def run(file_name):
 
     # make_histogram(G)
     # make_ccdf_clustering(G)
-
-    triangle_info = nx.triangles(G)
 
     # Strategy
     win = 0
@@ -106,5 +109,37 @@ def strategy_3(n, G):
     x = sorted(D, key = D.get, reverse=True)[:n]
     return x
 
+def output_file(n, G, file_name):
+    n1 = strategy_2(n, G)
+    n2 = strategy_3(n, G)
+    ret_lst = []
+    for i in range(50):
+        if i % 2:
+            ret_lst.extend(n1)
+        else:
+            ret_lst.extend(n2)
+    f = open(file_name[:-5] + '_output.txt', 'w')
+    assert len(ret_lst) == n * 50
+    for i in ret_lst:
+        f.write(str(i) + '\n')
+    f.close()
 
-run('testgraph1.json')
+
+
+run('8.35.1.json')
+
+# f = open('8.35.1.json')
+# data = json.loads(f.read())
+
+# graph_data = {}
+# for k, v in data.iteritems():
+#     graph_data[int(k)] = [int(x) for x in v]
+
+# g = open('dup.txt', 'w')
+# for y in range(35):
+#     x = random.choice(graph_data.keys())
+#     for i in range(50):
+#         g.write(str(x) + '\n')
+
+# g.close()
+
