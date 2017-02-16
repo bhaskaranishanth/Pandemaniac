@@ -33,20 +33,24 @@ def run(file_name):
     triangle_info = nx.triangles(G)
 
     # Strategy
-    start = 5
-    end = 30
-    win_rate = 0.0
-    for n in range(start, end):
-        s1_nodes = get_highest_degree_nodes(n, G)
-        s2_nodes = strategy_2(n, G)
-        # print "S1 nodes: ", sorted(s1_nodes)
-        # print "S2 nodes: ", sorted(s2_nodes)
-        strategies = {'s1' : s1_nodes, 's2' : s2_nodes}
+    win = 0
+    total = 0
+    for num_nodes in range(5, 30):
+        print 'Num nodes; ', num_nodes
+        total += 1
+        # s1_nodes = get_highest_degree_nodes(num_nodes, G)
 
+        s1_nodes = strategy_3(num_nodes, G)
+        s2_nodes = strategy_2(num_nodes, G)
+        strategies = {'s1' : s1_nodes, 's2' : s2_nodes}
         output = sim.run(graph_data, strategies)
-        print "N: ", n, " Output: ", output
-        win_rate += 1 if output['s2'] > output['s1'] else 0
-    print "Win Rate: ", win_rate / (end - start + 1)
+
+        if output['s2'] > output['s1']:
+            win += 1
+        print output
+        print 'Win: %d  Total: %d Perc: %f' % (win, total, float(win) / total)
+    # Make the degree histogram for G
+    return G
 
 
 def make_histogram(G):
@@ -92,10 +96,15 @@ def get_highest_degree_nodes(n, G):
 Choosing top n nodes with least degree, betweenness centrality
 '''
 def strategy_2(n, G):
+    triangle_info = nx.triangles(G)
+    node_order = sorted(triangle_info, key=lambda x:triangle_info[x], reverse=True)
+    return node_order[:n]
+
+def strategy_3(n, G):
     # Perform betweenness principle
     D = nx.closeness_centrality(G)
-    x = sorted(D, key = D.get, reverse=True)[:20]
+    x = sorted(D, key = D.get, reverse=True)[:n]
     return x
 
 
-run('testgraph2.json')
+run('testgraph1.json')
