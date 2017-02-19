@@ -22,10 +22,14 @@ def run(file_name):
         for n in v:
             G.add_edge(k, n)
 
-    # Output the two strategies
-    output_file(35, G, file_name)
+    # # Output the two strategies
+    # output_file(10, G, file_name)
 
-    return
+    # return
+
+
+
+
 
     # pprint(graph_data)
     # print G.nodes()
@@ -41,10 +45,22 @@ def run(file_name):
     for num_nodes in range(5, 30):
         print 'Num nodes; ', num_nodes
         total += 1
-        # s1_nodes = get_highest_degree_nodes(num_nodes, G)
+        # s1_nodes = get_highest_degree_nodes(num_nodes + num_nodes / 5, G)
 
-        s1_nodes = strategy_3(num_nodes, G)
-        s2_nodes = strategy_2(num_nodes, G)
+        # s1_nodes = strategy_3(num_nodes, G)
+        # s1_nodes = strategy_4(num_nodes, G)
+        # s2_nodes = strategy_4(num_nodes, G)
+        s2_nodes = strategy_5(num_nodes, G) # Best strategy so far
+        # s2_nodes = strategy_6(num_nodes, G)
+        # s2_nodes = strategy_7(num_nodes, G)
+        # s2_nodes = strategy_8(num_nodes, G)
+        # s2_nodes = strategy_2(num_nodes, G)
+
+        # print 's1 nodes: ', s1_nodes
+        # print 's2 nodes: ', s2_nodes
+        assert len(s2_nodes) == num_nodes
+        assert not set(s2_nodes).issubset(s1_nodes)
+
         strategies = {'s1' : s1_nodes, 's2' : s2_nodes}
         output = sim.run(graph_data, strategies)
 
@@ -109,6 +125,67 @@ def strategy_3(n, G):
     x = sorted(D, key = D.get, reverse=True)[:n]
     return x
 
+def strategy_4(n, G):
+    triangle_info = nx.triangles(G)
+    node_order = sorted(triangle_info, key=lambda x:triangle_info[x], reverse=True)
+
+    val = []
+    for x in node_order:
+        val.append(x)
+        neighbors = G[x]
+        neigh_order = sorted(neighbors, key=lambda x:triangle_info[x], reverse=True)
+
+        # val.extend(G[x])
+        val.append(neigh_order[0])
+        # val.append(neigh_order[-1])
+
+    # print val
+    # D = nx.closeness_centrality(G)
+    # x = sorted(D, key = D.get, reverse=True)
+
+    ret_set = set()
+    counter = 0
+    while len(ret_set) != n and counter < len(val):
+        ret_set.add(val[counter])
+        counter += 1
+
+    # print ret_set
+    assert len(ret_set) == n
+    return ret_set
+    # return node_order[:n]
+
+
+
+def strategy_5(n, G):
+    data_info = nx.number_of_cliques(G)
+    node_order = sorted(data_info, key=lambda x:data_info[x], reverse=True)
+
+    return node_order[:n]
+
+
+def strategy_6(n, G):
+    # data_info = nx.strongly_connected_components_recursive(nx.DiGraph(G))
+    # Get largest connected component
+    node_order = max(nx.strongly_connected_components_recursive(nx.DiGraph(G)), key=len)
+    # sorted(data_info, key=lambda x:data_info[x], reverse=True)
+    # print node_order
+
+    return node_order[:n]
+
+def strategy_7(n, G):
+    data_info = nx.pagerank(G)
+    node_order = sorted(data_info, key=lambda x:data_info[x], reverse=True)
+
+    return node_order[:n]
+
+def strategy_8(n, G):
+    # Perform betweenness principle
+    D = nx.betweenness_centrality(G)
+    x = sorted(D, key = D.get, reverse=True)[:n]
+    return x
+
+
+
 def output_file(n, G, file_name):
     n1 = strategy_2(n, G)
     n2 = strategy_3(n, G)
@@ -126,19 +203,19 @@ def output_file(n, G, file_name):
 
 
 
-run('8.35.1.json')
+run('2.10.31.json')
 
-# f = open('8.35.1.json')
+# f = open('8.35.2.json')
 # data = json.loads(f.read())
-
+# f.close()
 # graph_data = {}
 # for k, v in data.iteritems():
 #     graph_data[int(k)] = [int(x) for x in v]
 
 # g = open('dup.txt', 'w')
 # for y in range(35):
-#     x = random.choice(graph_data.keys())
 #     for i in range(50):
+#         x = random.choice(graph_data.keys())
 #         g.write(str(x) + '\n')
 
 # g.close()
