@@ -17,6 +17,7 @@ def run(file_name):
         graph_data[int(k)] = [int(x) for x in v]
 
     # pprint(graph_data)
+    print len(graph_data)
 
     G = nx.Graph()
     for k, v in graph_data.iteritems():
@@ -24,7 +25,7 @@ def run(file_name):
             G.add_edge(k, n)
 
     # # Output the two strategies
-    # output_file(10, G, file_name)
+    # output_file(20, G, file_name)
 
     # return
 
@@ -41,21 +42,22 @@ def run(file_name):
     # Strategy
     win = 0
     total = 0
-    for num_nodes in range(10, 11):
+    for num_nodes in range(10, 20):
         print 'Num nodes; ', num_nodes
         total += 1
-        s1_nodes = get_highest_degree_nodes(num_nodes, G)
+        # s1_nodes = get_highest_degree_nodes(num_nodes, G)
 
 
-        # s1_nodes = strategy_3(num_nodes, G)
+        s1_nodes = strategy_2(num_nodes, G)
+        # s2_nodes = strategy_3(num_nodes, G) # Closeness
         # s1_nodes = strategy_4(num_nodes, G)
-        # s2_nodes = strategy_4(num_nodes, G)
+        s2_nodes = strategy_4(num_nodes, G)
         # s2_nodes = strategy_5(num_nodes, G) # Best strategy so far
         # s2_nodes = strategy_6(num_nodes, G)
         # s2_nodes = strategy_7(num_nodes, G)
-        # s2_nodes = strategy_8(num_nodes, G)
+        # s2_nodes = strategy_8(num_nodes, G) # Betweenness
         # s2_nodes = strategy_2(num_nodes, G)
-        s2_nodes = strategy_9(num_nodes, G)
+        # s2_nodes = strategy_9(num_nodes, G)
 
 
         # print 's1 nodes: ', s1_nodes
@@ -65,9 +67,11 @@ def run(file_name):
         # printIntersection(s1_nodes, s2_nodes)
         # s1_nodes = [57, 54, 53, 18]
         # s2_nodes = [60, 80]
-        # strategies = {'s1' : s1_nodes, 's2' : s2_nodes}
-        # output = sim.run(graph_data, strategies)
-        # print output
+
+        strategies = {'s1' : s1_nodes, 's2' : s2_nodes }
+
+        output = sim.run(graph_data, strategies)
+        print output
 
         # if output['s2'] > output['s1']:
         #     win += 1
@@ -152,7 +156,7 @@ def strategy_2(n, G):
     return node_order[:n]
 
 def strategy_3(n, G):
-    # Perform betweenness principle
+    # Perform closeness principle
     D = nx.closeness_centrality(G)
     x = sorted(D, key = D.get, reverse=True)[:n]
     return x
@@ -255,15 +259,23 @@ def strategy_9(n, G):
 
 
 def output_file(n, G, file_name):
-    n1 = strategy_2(n, G)
-    n2 = strategy_3(n, G)
+    # n1 = strategy_3(100, G)[20:40]
+    n2 = strategy_5(100, G)[20:40]
+    # n3 = strategy_8(100, G)[20:40]
+    # n3 = get_highest_degree_nodes(100, G)[20:40]
+
+
     ret_lst = []
     for i in range(50):
-        if i % 2:
-            ret_lst.extend(n1)
-        else:
-            ret_lst.extend(n2)
-    f = open(file_name[:-5] + '_output.txt', 'w')
+        # if i % 3 == 0:
+        #     ret_lst.extend(n1)
+        # elif i % 3 == 1: 
+        #     ret_lst.extend(n2)
+        # else:
+        #     ret_lst.extend(n3)
+        ret_lst.extend(n2)
+
+    f = open(file_name[:-5] + '_dup_output.txt', 'w')
     assert len(ret_lst) == n * 50
     for i in ret_lst:
         f.write(str(i) + '\n')
@@ -271,7 +283,7 @@ def output_file(n, G, file_name):
 
 
 
-run('2.10.31.json')
+run('6.20.1.json')
 
 # f = open('8.35.2.json')
 # data = json.loads(f.read())
